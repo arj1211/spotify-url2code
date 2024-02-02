@@ -1,2 +1,6 @@
 *_env/
 *.env
+*.svg
+*.png
+*.jpg
+*.jpeg
