@@ -22,7 +22,7 @@ class SpotifyAPI:
             'Authorization': 'Bearer {token}'.format(token=self.access_token)
         }
         response = requests.get(f'https://api.spotify.com/v1/tracks/{track_id}', headers=headers)
-        response_data = response.json()['album']
+        response_data = response.json()
 
         track_name = response_data['name']
         artist_names = [r['name'] for r in response_data['artists']]
