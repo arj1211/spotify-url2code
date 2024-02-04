@@ -2,33 +2,40 @@ import os
 from dotenv import load_dotenv
 import requests
 
-# Load environment variables from .env file
-load_dotenv('secrets.env')
+class SpotifyAPI:
+    def __init__(self, client_id:str, client_secret:str):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.access_token = self.get_access_token()
 
-# Get the Spotify Client ID and Client Secret from environment variables
-CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
-CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
+    def get_access_token(self):
+        auth_response = requests.post(
+            'https://accounts.spotify.com/api/token',
+            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            params={'grant_type': 'client_credentials', 'client_id': self.client_id, 'client_secret': self.client_secret}
+        )
+        auth_response_data = auth_response.json()
+        return auth_response_data['access_token']
 
-# Get the access token
-auth_response = requests.post(
-    'https://accounts.spotify.com/api/token',
-    headers={'Content-Type': 'application/x-www-form-urlencoded'},
-    params={'grant_type': 'client_credentials', 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET}
-)
-auth_response_data = auth_response.json()
-access_token = auth_response_data['access_token']
+    def get_track_info(self, track_id:str):
+        headers = {
+            'Authorization': 'Bearer {token}'.format(token=self.access_token)
+        }
+        response = requests.get(f'https://api.spotify.com/v1/tracks/{track_id}', headers=headers)
+        response_data = response.json()['album']
 
-headers = {
-    'Authorization': 'Bearer {token}'.format(token=access_token)
-}
+        track_name = response_data['name']
+        artist_names = [r['name'] for r in response_data['artists']]
 
-# Use the tracks endpoint
-track_id = '5EFczt9dqrCu60udoD41Yy'
-response = requests.get(f'https://api.spotify.com/v1/tracks/{track_id}', headers=headers)
-response_data = response.json()['album']
+        return track_name, artist_names
 
-track_name = response_data['name']
-artist_names = [r['name'] for r in response_data['artists']]
+if __name__ == "__main__":
+    load_dotenv('secrets.env')
+    CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
+    CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 
-print('Title:', track_name)
-print('Artists:', artist_names)
+    spotify = SpotifyAPI(CLIENT_ID, CLIENT_SECRET)
+    track_name, artist_names = spotify.get_track_info('5EFczt9dqrCu60udoD41Yy')
+
+    print('Title:', track_name)
+    print('Artists:', artist_names)
