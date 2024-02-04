@@ -28,8 +28,12 @@ def get_svg_filepaths(directory: str):
 
 
 def rename_file(file_path: str):
+
+    directory, file_name = os.path.split(file_path)
+    file_name = os.path.splitext(file_name)[0]
+
     # Extract the track ID from the filename
-    track_id = os.path.basename(file_path).split("-")[1].split(".")[0]
+    track_id = file_name.split("-")[1]
 
     # Get the track info using the track ID
     load_dotenv("secrets.env")
