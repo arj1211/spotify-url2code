@@ -59,5 +59,5 @@ def rename_file(file_path: str):
 if __name__ == "__main__":
     svg_filepaths = "downloaded_song_codes"
     for fp in get_svg_filepaths(svg_filepaths):
-        change_svg_logo_color(fp, '3d3d3d')
+        change_svg_logo_color(fp, '707070')
         rename_file(fp)
